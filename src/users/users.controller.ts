@@ -1,0 +1,44 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  DefaultValuePipe,
+  Patch,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { GetUsersParamDto } from './dtos/get-users-param.dto';
+import { PatchUserDto } from './dtos/patch-user.dto';
+import { UsersService } from './providers/users.service';
+
+@Controller('users')
+export class UsersController {
+  constructor(
+    // injecting user service into the controller
+    private readonly usersService: UsersService,
+  ) {}
+
+  // GET http://localhost:3000/users/1/optional?limit=10
+  @Get('{/:id}')
+  public getUsers(
+    @Param() getUsersParamDto: GetUsersParamDto,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    return this.usersService.findAll(getUsersParamDto, limit, page);
+  }
+
+  @Post()
+  public createUser(@Body() createUserDto: CreateUserDto): string {
+    console.log(createUserDto instanceof CreateUserDto);
+    return 'This action adds a new user';
+  }
+
+  @Patch()
+  public patchUser(@Body() patchUserDto: PatchUserDto) {
+    return patchUserDto;
+  }
+}
